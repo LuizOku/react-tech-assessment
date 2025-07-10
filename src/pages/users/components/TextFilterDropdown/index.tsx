@@ -1,7 +1,7 @@
 import { SearchOutlined } from "@ant-design/icons";
 import { Button, Input, Space } from "antd";
 import { FilterConfirmProps } from "antd/es/table/interface";
-
+import { useIntl } from "react-intl";
 
 interface TextFilterDropdownProps {
   placeholder: string;
@@ -10,6 +10,7 @@ interface TextFilterDropdownProps {
   confirm: (param?: FilterConfirmProps) => void;
   clearFilters?: () => void;
 }
+
 export function TextFilterDropdown({
   placeholder,
   selectedKeys,
@@ -17,6 +18,8 @@ export function TextFilterDropdown({
   confirm,
   clearFilters,
 }: TextFilterDropdownProps) {
+  const { formatMessage } = useIntl();
+
   return (
     <div style={{ padding: 8 }}>
       <Input
@@ -34,7 +37,7 @@ export function TextFilterDropdown({
           size="small"
           style={{ width: 90 }}
         >
-          Search
+          {formatMessage({ id: "page.users.filter.button.search" })}
         </Button>
         <Button
           onClick={() => {
@@ -44,7 +47,7 @@ export function TextFilterDropdown({
           size="small"
           style={{ width: 90 }}
         >
-          Reset
+          {formatMessage({ id: "page.users.filter.button.reset" })}
         </Button>
       </Space>
     </div>

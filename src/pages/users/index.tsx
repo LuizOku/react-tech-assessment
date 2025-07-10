@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect } from "react";
 import { Table, Avatar, Typography, Card, Space, message, Spin } from "antd";
 import { SearchOutlined, UserOutlined, LoadingOutlined } from "@ant-design/icons";
 import type { ColumnsType, TableProps } from "antd/es/table";
+import { useIntl } from "react-intl";
 import ContentLayout from "components/layout/content/contentLayout";
 import { useGetUsers } from "hooks/react-query/users";
 import { UserData, UsersFilterParams, UsersSortParams } from "services/users/interface";
@@ -13,11 +14,11 @@ interface UsersTableData extends UserData {
 }
 
 export function Users() {
+  const { formatMessage } = useIntl();
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(13);
   const [filters, setFilters] = useState<UsersFilterParams>({});
   const [sort, setSort] = useState<UsersSortParams>({});
-
 
   const skip = (currentPage - 1) * pageSize;
   const { data, isLoading, isError, isFetching } = useGetUsers(pageSize, skip, filters, sort);
@@ -25,9 +26,9 @@ export function Users() {
   // Handle error feedback
   useEffect(() => {
     if (isError) {
-      message.error('Failed to load users data');
+      message.error(formatMessage({ id: "page.users.error.loadFailed" }));
     }
-  }, [isError]);
+  }, [isError, formatMessage]);
 
   const tableData: UsersTableData[] = useMemo(() => {
     if (!data?.users) return [];
@@ -48,7 +49,7 @@ export function Users() {
     {
       title: (
         <Space>
-          ID
+          {formatMessage({ id: "page.users.column.id" })}
           {isFilteringOrSorting && sort.sortBy === 'id' && (
             <Spin indicator={<LoadingOutlined />} />
           )}
@@ -63,7 +64,7 @@ export function Users() {
     {
       title: (
         <Space>
-          First Name
+          {formatMessage({ id: "page.users.column.firstName" })}
           {isFilteringOrSorting && (filters.firstName || sort.sortBy === 'firstName') && (
             <Spin indicator={<LoadingOutlined />} />
           )}
@@ -76,7 +77,7 @@ export function Users() {
       filterDropdown: (props) => (
         <TextFilterDropdown
           {...props}
-          placeholder="Search first name"
+          placeholder={formatMessage({ id: "page.users.filter.firstName.placeholder" })}
         />
       ),
       filterIcon: () => (
@@ -88,7 +89,7 @@ export function Users() {
     {
       title: (
         <Space>
-          Last Name
+          {formatMessage({ id: "page.users.column.lastName" })}
           {isFilteringOrSorting && (filters.lastName || sort.sortBy === 'lastName') && (
             <Spin indicator={<LoadingOutlined />} />
           )}
@@ -101,7 +102,7 @@ export function Users() {
       filterDropdown: (props) => (
         <TextFilterDropdown
           {...props}
-          placeholder="Search last name"
+          placeholder={formatMessage({ id: "page.users.filter.lastName.placeholder" })}
         />
       ),
       filterIcon: () => (
@@ -111,7 +112,7 @@ export function Users() {
       sortOrder: sort.sortBy === 'lastName' ? (sort.sortOrder === 'asc' ? 'ascend' : 'descend') : null,
     },
     {
-      title: 'Name',
+      title: formatMessage({ id: "page.users.column.name" }),
       dataIndex: 'fullName',
       key: 'fullName',
       width: 200,
@@ -129,7 +130,7 @@ export function Users() {
     {
       title: (
         <Space>
-          Email
+          {formatMessage({ id: "page.users.column.email" })}
           {isFilteringOrSorting && sort.sortBy === 'email' && (
             <Spin indicator={<LoadingOutlined />} />
           )}
@@ -143,7 +144,7 @@ export function Users() {
       render: (email) => <Typography.Text copyable>{email}</Typography.Text>,
     },
     {
-      title: 'Image',
+      title: formatMessage({ id: "page.users.column.image" }),
       dataIndex: 'image',
       key: 'image',
       width: 100,
@@ -156,7 +157,7 @@ export function Users() {
         />
       ),
     },
-  ], [isFilteringOrSorting, filters.firstName, filters.lastName, sort.sortBy, sort.sortOrder]);
+  ], [isFilteringOrSorting, filters.firstName, filters.lastName, sort.sortBy, sort.sortOrder, formatMessage]);
 
   const handleTableChange: TableProps<UsersTableData>['onChange'] = (
     pagination,
@@ -208,7 +209,7 @@ export function Users() {
           dataSource={tableData}
           loading={{
             spinning: isLoading,
-            tip: "Fetching users...",
+            tip: formatMessage({ id: "page.users.loading.fetching" }),
           }}
           pagination={{
             current: currentPage,
@@ -217,7 +218,7 @@ export function Users() {
             showSizeChanger: true,
             showQuickJumper: true,
             showTotal: (total, range) =>
-              `${range[0]}-${range[1]} of ${total} users`,
+              `${range[0]}-${range[1]} of ${total} ${formatMessage({ id: "page.users.pagination.total" })}`,
             pageSizeOptions: ['13', '25', '50', '100'],
           }}
           onChange={handleTableChange}
@@ -225,7 +226,7 @@ export function Users() {
           size="middle"
           bordered
           showSorterTooltip={{
-            title: 'Click to sort',
+            title: formatMessage({ id: "page.users.sort.tooltip" }),
           }}
         />
       </Card>
