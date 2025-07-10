@@ -14,12 +14,12 @@ export function AppConfigProvider({ children }: AppConfigProviderProps) {
   useEffect(() => {
     const handleValidation = async () => {
       setLoading(true);
-      // fetch the brand
-      if (brandId) {
-        updateBrandId(brandId);
-      } else {
+
+      // Only update brandId if it's not already set
+      if (!brandId) {
         updateBrandId("87");
       }
+
       setTimeout(() => setLoading(false), 500);
     };
 

@@ -33,7 +33,7 @@ export function AuthenticationProvider({
     };
 
     handleValidation();
-  }, []);
+  }, [dispatch]);
 
   return <>{auth.accessToken ? children : <Login />}</>;
 }
