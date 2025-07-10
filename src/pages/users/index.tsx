@@ -1,11 +1,11 @@
 import { useState, useMemo, useEffect } from "react";
-import { Table, Input, Avatar, Typography, Card, Space, Button, message } from "antd";
+import { Table, Avatar, Typography, Card, Space, message } from "antd";
 import { SearchOutlined, UserOutlined } from "@ant-design/icons";
 import type { ColumnsType, TableProps } from "antd/es/table";
-import type { FilterConfirmProps } from "antd/es/table/interface";
 import ContentLayout from "components/layout/content/contentLayout";
 import { useGetUsers } from "hooks/react-query/users";
 import { UserData } from "services/users/interface";
+import { TextFilterDropdown } from "./components/TextFilterDropdown";
 
 const { Title } = Typography;
 
@@ -13,53 +13,6 @@ interface UsersTableData extends UserData {
   key: string;
   fullName: string;
 }
-
-interface TextFilterDropdownProps {
-  placeholder: string;
-  selectedKeys: React.Key[];
-  setSelectedKeys: (keys: React.Key[]) => void;
-  confirm: (param?: FilterConfirmProps) => void;
-  clearFilters?: () => void;
-}
-
-const TextFilterDropdown = ({
-  placeholder,
-  selectedKeys,
-  setSelectedKeys,
-  confirm,
-  clearFilters,
-}: TextFilterDropdownProps) => (
-  <div style={{ padding: 8 }}>
-    <Input
-      placeholder={placeholder}
-      value={selectedKeys[0]}
-      onChange={e => setSelectedKeys(e.target.value ? [e.target.value] : [])}
-      onPressEnter={() => confirm()}
-      style={{ width: 188, marginBottom: 8, display: 'block' }}
-    />
-    <Space>
-      <Button
-        type="primary"
-        onClick={() => confirm()}
-        icon={<SearchOutlined />}
-        size="small"
-        style={{ width: 90 }}
-      >
-        Search
-      </Button>
-      <Button
-        onClick={() => {
-          clearFilters?.();
-          confirm();
-        }}
-        size="small"
-        style={{ width: 90 }}
-      >
-        Reset
-      </Button>
-    </Space>
-  </div>
-);
 
 export function Users() {
   const [currentPage, setCurrentPage] = useState(1);
