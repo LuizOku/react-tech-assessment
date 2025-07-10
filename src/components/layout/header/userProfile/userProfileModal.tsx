@@ -22,7 +22,7 @@ export const UserProfileModal = ({
   const logout = useCallback(() => {
     LoginService.logout();
     dispatch(updateAuth({ accessToken: null, refreshToken: null }));
-  }, []);
+  }, [dispatch]);
 
   return (
     <Modal open={open} onCancel={closeModal} footer={null} width={"800px"}>

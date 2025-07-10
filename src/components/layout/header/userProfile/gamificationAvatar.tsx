@@ -16,6 +16,7 @@ export function GamificationAvatar({
     <Row align="middle" justify="center">
       <Col>
         <img
+          alt="gamification avatar"
           src={src}
           style={{
             padding: 1,

@@ -21,7 +21,7 @@ export function useBrandIdSubscribedQuery<T>(
     if (brandId) {
       query.refetch();
     }
-  }, [brandId]);
+  }, [brandId, query]);
 
   return query;
 }

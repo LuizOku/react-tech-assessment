@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useGetBrandId, useUpdateBrandId } from "hooks";
-import { FullPageSpin } from "components";
+import { FullPageSpin } from "components/fullPageSpin";
 
 interface AppConfigProviderProps {
   children: JSX.Element | JSX.Element[];
@@ -14,19 +14,19 @@ export function AppConfigProvider({ children }: AppConfigProviderProps) {
   useEffect(() => {
     const handleValidation = async () => {
       setLoading(true);
-      // fetch the brand
-      if (brandId) {
-        updateBrandId(brandId);
-      } else {
+
+      // Only update brandId if it's not already set
+      if (!brandId) {
         updateBrandId("87");
       }
+
       setTimeout(() => setLoading(false), 500);
     };
 
     handleValidation();
-  }, [brandId]);
+  }, [brandId, updateBrandId]);
 
-  // if (loading) return <FullPageSpin />;
+  if (loading) return <FullPageSpin />;
 
   return <>{children}</>;
 }

@@ -49,9 +49,9 @@ export const BrandSelect = () => {
     } else if (!matchingBrand) {
       updateBrandId(myBrands?.list[0]?.id?.toString() || "0");
     }
-  }, [myBrands, brandList, brandId]);
+  }, [myBrands, brandList, brandId, selectedBrand?.id, updateBrandId]);
 
-  const fetchBrands = () => {};
+  const fetchBrands = () => { };
   const onSearch = (val: string) => {
     setSearchValue(val || "");
   };

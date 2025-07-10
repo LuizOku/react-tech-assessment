@@ -20,7 +20,7 @@ export function UserProfile() {
   const { formatMessage } = useIntl();
 
   const { useGetDetail, useUpdate } = useUserCRUD();
-  const { data, isSuccess, isLoading, isError } = useGetDetail();
+  const { data, isSuccess, isLoading } = useGetDetail();
   const { mutateAsync, isLoading: updateIsLoading } = useUpdate(data?.id);
 
   const handleOnFinish = (values: Record<string, string>) => {
