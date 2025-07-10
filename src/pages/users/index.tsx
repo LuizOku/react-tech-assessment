@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
-import { Table, Avatar, Typography, Card, Space, message, Spin } from "antd";
+import { Table, Avatar, Typography, Card, Space, message, Spin, Alert } from "antd";
 import { SearchOutlined, UserOutlined, LoadingOutlined } from "@ant-design/icons";
 import type { ColumnsType, TableProps } from "antd/es/table";
 import { useIntl } from "react-intl";
@@ -7,6 +7,9 @@ import ContentLayout from "components/layout/content/contentLayout";
 import { useGetUsers } from "hooks/react-query/users";
 import { UserData, UsersFilterParams, UsersSortParams } from "services/users/interface";
 import { TextFilterDropdown } from "./components/TextFilterDropdown";
+
+// Check if we're using fake API mode
+const isFakeApiMode = process.env.REACT_APP_FAKE_API_MODE === "true";
 
 interface UsersTableData extends UserData {
   key: string;
@@ -164,24 +167,25 @@ export function Users() {
     filterInfo,
     sorter
   ) => {
-    // Handle pagination
-    if (pagination) {
-      setCurrentPage(pagination.current || 1);
-      setPageSize(pagination.pageSize || 13);
-    }
+    let shouldResetPage = false;
 
     // Handle sorting
     if (sorter && !Array.isArray(sorter)) {
-      if (sorter.order) {
+      const newSortBy = sorter.field as string;
+      const newSortOrder = sorter.order === 'ascend' ? 'asc' : 'desc';
+
+      // Check if sort actually changed
+      if (sorter.order && (sort.sortBy !== newSortBy || sort.sortOrder !== newSortOrder)) {
         setSort({
-          sortBy: sorter.field as string,
-          sortOrder: sorter.order === 'ascend' ? 'asc' : 'desc',
+          sortBy: newSortBy,
+          sortOrder: newSortOrder,
         });
-      } else {
+        shouldResetPage = true;
+      } else if (!sorter.order && (sort.sortBy || sort.sortOrder)) {
+        // Clearing sort
         setSort({});
+        shouldResetPage = true;
       }
-      // Reset to first page when sorting changes
-      setCurrentPage(1);
     }
 
     // Handle filtering
@@ -193,17 +197,40 @@ export function Users() {
       newFilters.lastName = filterInfo.lastName[0] as string;
     }
 
-    // Only update if filters actually changed
+    // Check if filters actually changed
     if (JSON.stringify(newFilters) !== JSON.stringify(filters)) {
       setFilters(newFilters);
-      // Reset to first page when filters change
+      shouldResetPage = true;
+    }
+
+    // Handle pagination - only if no sort/filter changes occurred
+    if (pagination && !shouldResetPage) {
+      setCurrentPage(pagination.current || 1);
+      setPageSize(pagination.pageSize || 13);
+    } else if (shouldResetPage) {
+      // Reset to first page when sorting or filtering changes
       setCurrentPage(1);
+      // Update page size if it changed
+      if (pagination?.pageSize && pagination.pageSize !== pageSize) {
+        setPageSize(pagination.pageSize);
+      }
     }
   };
 
   return (
     <ContentLayout>
       <Card className="relative">
+        {!isFakeApiMode && (
+          <Alert
+            message={formatMessage({ id: "page.users.api.limitation.title" })}
+            description={formatMessage({ id: "page.users.api.limitation.description" })}
+            type="info"
+            showIcon
+            closable
+            style={{ marginBottom: 16 }}
+          />
+        )}
+
         <Table<UsersTableData>
           columns={columns}
           dataSource={tableData}

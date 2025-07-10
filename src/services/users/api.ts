@@ -20,8 +20,8 @@ export class UsersApiService extends UsersService {
     }
 
     // Note: dummyjson.com doesn't support filtering by firstName/lastName directly
-    // For a real API, you would add filter parameters here
-    // For now, we'll handle filtering client-side as a fallback
+    // For proper filtering support, use the fake service by setting REACT_APP_FAKE_API_MODE=true
+    // We'll ignore filters for the real API to maintain proper pagination
 
     const response = await fetch(
       `${this.baseURL}/users?${params.toString()}`
@@ -31,20 +31,10 @@ export class UsersApiService extends UsersService {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    let data = await response.json();
+    const data = await response.json();
 
-    // Apply client-side filtering as fallback since dummyjson.com doesn't support it
-    if (filters?.firstName || filters?.lastName) {
-      data.users = data.users.filter((user: any) => {
-        const firstNameMatch = !filters.firstName ||
-          user.firstName.toLowerCase().includes(filters.firstName.toLowerCase());
-        const lastNameMatch = !filters.lastName ||
-          user.lastName.toLowerCase().includes(filters.lastName.toLowerCase());
-        return firstNameMatch && lastNameMatch;
-      });
-      data.total = data.users.length;
-    }
-
+    // Return the data as-is to maintain proper pagination
+    // If filters are applied, they won't work with the real API
     return data as UsersResponse;
   }
 } 
