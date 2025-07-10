@@ -13,6 +13,6 @@ export function useAppNavigate() {
         search: `?${brandIdparamName}=${brandId}`,
       });
     },
-    [brandId]
+    [brandId, navigate]
   );
 }

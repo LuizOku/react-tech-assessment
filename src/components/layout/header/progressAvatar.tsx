@@ -24,6 +24,7 @@ export function ProgressAvatar({
       }}
     >
       <img
+        alt="progress avatar"
         src={src}
         style={{
           padding: 1,

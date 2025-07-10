@@ -1,4 +1,3 @@
-import { AuthedService } from "../base/authedService";
 import { UserProfileData, UserProfileService } from "./interface";
 
 export class UserProfileApiService extends UserProfileService {

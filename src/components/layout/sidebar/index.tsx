@@ -1,8 +1,7 @@
 import { DashboardOutlined, UserOutlined } from "@ant-design/icons";
-import { Layout, Menu, Avatar, theme, Row, Col, Image } from "antd";
+import { Layout, Menu, theme, Row, Col } from "antd";
 import { AppPath } from "components";
 import { useAppNavigate } from "hooks";
-import { header_logo, header_logo_collapsed } from "assets";
 import { AppLayoutContext } from "..";
 import { useContext } from "react";
 import { MenuItemType } from "antd/es/menu/hooks/useItems";

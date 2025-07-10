@@ -22,7 +22,7 @@ export function EnvironmentConfigProvider({
       dispatch(updateEnvironmentConfig(environmentConfig));
     };
     handleFetch();
-  }, []);
+  }, [dispatch]);
 
   return <>{config.loading ? <></> : children}</>;
 }

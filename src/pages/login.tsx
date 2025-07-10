@@ -4,7 +4,7 @@ import { theme } from "antd";
 import LoginService from "services/login";
 import { updateAuth } from "store/auth";
 import { useAppDispatch } from "hooks";
-import { login_big, login_logo } from "assets";
+import { login_big } from "assets";
 import { useIntl } from "react-intl";
 
 const { Content } = Layout;
@@ -15,10 +15,10 @@ const LoginScreen: React.FC = () => {
   const { formatMessage } = useIntl();
 
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null || "");
+  const [error, setError] = useState<string | null>(null);
 
   const {
-    token: { colorPrimary, colorWhite, padding },
+    token: { colorPrimary, padding },
   } = theme.useToken();
 
   const handleLogin = async (values: any) => {
@@ -41,7 +41,6 @@ const LoginScreen: React.FC = () => {
       setLoading(false);
     }
   };
-  // if (loading) return <Loading />;
 
   return (
     <Layout>
