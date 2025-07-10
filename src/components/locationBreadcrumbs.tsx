@@ -15,6 +15,7 @@ const basebreadcrumbNameMap: Record<string, string> = {
   [AppPath.home]: "navigation.dashboard",
   [AppPath.brandProfile]: "navigation.brandProfile",
   [AppPath.userProfile]: "navigation.userProfile",
+  [AppPath.users]: "navigation.users",
 };
 
 export function LocationBreadcrumbs({
@@ -50,8 +51,8 @@ export function LocationBreadcrumbs({
           <Link to={linkBuilder(url)}>
             {allBreadcrumbNameMap[url]
               ? formatMessage({
-                  id: allBreadcrumbNameMap[url],
-                })
+                id: allBreadcrumbNameMap[url],
+              })
               : breadcrumbEnd}
           </Link>
         ),
