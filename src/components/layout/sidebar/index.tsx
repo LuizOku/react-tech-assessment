@@ -36,6 +36,11 @@ export function AppSidebar({ collapsed, setCollapsed }: AppSidebarProps) {
       label: "Brand",
       icon: <UserOutlined />,
     },
+    {
+      key: AppPath.users,
+      label: "Users",
+      icon: <UserOutlined />,
+    },
   ];
 
   const allMenuItems = [
@@ -70,7 +75,7 @@ export function AppSidebar({ collapsed, setCollapsed }: AppSidebarProps) {
             mode="inline"
             items={allMenuItems}
             onClick={(event) => navigate(event.key)}
-            //warning: [antd: Menu] `inlineCollapsed` not control Menu under Sider. Should set `collapsed` on Sider instead.
+          //warning: [antd: Menu] `inlineCollapsed` not control Menu under Sider. Should set `collapsed` on Sider instead.
           />
         </Col>
       </Row>
