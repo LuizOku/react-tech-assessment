@@ -49,13 +49,60 @@ const mockUsers: UserData[] = [
     gender: "female",
     birthDate: "1995-08-22"
   },
-  // Add more mock users...
+  {
+    id: 3,
+    firstName: "Bob",
+    lastName: "Wilson",
+    email: "bob.wilson@example.com",
+    image: "https://picsum.photos/id/3/200/300",
+    username: "bobwilson",
+    phone: "+1234567892",
+    address: {
+      address: "789 Pine St",
+      city: "Chicago",
+      state: "IL",
+      country: "United States",
+      postalCode: "60601"
+    },
+    company: {
+      name: "Marketing Inc",
+      department: "Marketing",
+      title: "Marketing Manager"
+    },
+    age: 35,
+    gender: "male",
+    birthDate: "1988-03-10"
+  },
+  {
+    id: 4,
+    firstName: "Miles",
+    lastName: "Cummerata",
+    email: "miles.cummerata@example.com",
+    image: "https://picsum.photos/id/4/200/300",
+    username: "milescummerata",
+    phone: "+1234567893",
+    address: {
+      address: "321 Elm St",
+      city: "Houston",
+      state: "TX",
+      country: "United States",
+      postalCode: "77001"
+    },
+    company: {
+      name: "Data Solutions",
+      department: "Analytics",
+      title: "Data Analyst"
+    },
+    age: 32,
+    gender: "male",
+    birthDate: "1991-07-18"
+  }
 ];
 
 // Generate more mock users to have enough data for testing
 const generateMockUsers = (count: number): UserData[] => {
   const users: UserData[] = [];
-  for (let i = 3; i <= count; i++) {
+  for (let i = 5; i <= count; i++) {
     users.push({
       id: i,
       firstName: `FirstName${i}`,
