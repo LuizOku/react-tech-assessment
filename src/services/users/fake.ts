@@ -1,4 +1,4 @@
-import { UsersService, UsersResponse, UserData } from "./interface";
+import { UsersService, UsersResponse, UserData, UsersFilterParams, UsersSortParams } from "./interface";
 
 const mockUsers: UserData[] = [
   {
@@ -141,13 +141,64 @@ export class UsersFakeService extends UsersService {
     this.latencyDuration = latencyDuration;
   }
 
-  async getAll(limit: number = 30, skip: number = 0): Promise<UsersResponse> {
+  async getAll(
+    limit: number = 30,
+    skip: number = 0,
+    filters?: UsersFilterParams,
+    sort?: UsersSortParams
+  ): Promise<UsersResponse> {
     return new Promise((resolve) => {
       setTimeout(() => {
-        const users = allMockUsers.slice(skip, skip + limit);
+        let filteredUsers = [...allMockUsers];
+
+        // Apply filters
+        if (filters?.firstName) {
+          filteredUsers = filteredUsers.filter(user =>
+            user.firstName.toLowerCase().includes(filters.firstName!.toLowerCase())
+          );
+        }
+        if (filters?.lastName) {
+          filteredUsers = filteredUsers.filter(user =>
+            user.lastName.toLowerCase().includes(filters.lastName!.toLowerCase())
+          );
+        }
+
+        // Apply sorting
+        if (sort?.sortBy && sort?.sortOrder) {
+          filteredUsers.sort((a, b) => {
+            let aValue = '';
+            let bValue = '';
+
+            switch (sort.sortBy) {
+              case 'firstName':
+                aValue = a.firstName;
+                bValue = b.firstName;
+                break;
+              case 'lastName':
+                aValue = a.lastName;
+                bValue = b.lastName;
+                break;
+              case 'email':
+                aValue = a.email;
+                bValue = b.email;
+                break;
+              case 'id':
+                return sort.sortOrder === 'asc' ? a.id - b.id : b.id - a.id;
+              default:
+                return 0;
+            }
+
+            const result = aValue.localeCompare(bValue);
+            return sort.sortOrder === 'asc' ? result : -result;
+          });
+        }
+
+        // Apply pagination
+        const users = filteredUsers.slice(skip, skip + limit);
+
         resolve({
           users,
-          total: allMockUsers.length,
+          total: filteredUsers.length,
           skip,
           limit
         });

@@ -30,6 +30,21 @@ export interface UsersResponse {
   limit: number;
 }
 
+export interface UsersFilterParams {
+  firstName?: string;
+  lastName?: string;
+}
+
+export interface UsersSortParams {
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+}
+
 export abstract class UsersService {
-  abstract getAll(limit?: number, skip?: number): Promise<UsersResponse>;
+  abstract getAll(
+    limit?: number,
+    skip?: number,
+    filters?: UsersFilterParams,
+    sort?: UsersSortParams
+  ): Promise<UsersResponse>;
 } 

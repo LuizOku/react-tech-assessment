@@ -1,13 +1,11 @@
 import { useState, useMemo, useEffect } from "react";
-import { Table, Avatar, Typography, Card, Space, message } from "antd";
-import { SearchOutlined, UserOutlined } from "@ant-design/icons";
+import { Table, Avatar, Typography, Card, Space, message, Spin } from "antd";
+import { SearchOutlined, UserOutlined, LoadingOutlined } from "@ant-design/icons";
 import type { ColumnsType, TableProps } from "antd/es/table";
 import ContentLayout from "components/layout/content/contentLayout";
 import { useGetUsers } from "hooks/react-query/users";
-import { UserData } from "services/users/interface";
+import { UserData, UsersFilterParams, UsersSortParams } from "services/users/interface";
 import { TextFilterDropdown } from "./components/TextFilterDropdown";
-
-const { Title } = Typography;
 
 interface UsersTableData extends UserData {
   key: string;
@@ -17,9 +15,12 @@ interface UsersTableData extends UserData {
 export function Users() {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(13);
+  const [filters, setFilters] = useState<UsersFilterParams>({});
+  const [sort, setSort] = useState<UsersSortParams>({});
+
 
   const skip = (currentPage - 1) * pageSize;
-  const { data, isLoading, isError } = useGetUsers(pageSize, skip);
+  const { data, isLoading, isError, isFetching } = useGetUsers(pageSize, skip, filters, sort);
 
   // Handle error feedback
   useEffect(() => {
@@ -38,52 +39,76 @@ export function Users() {
     }));
   }, [data?.users]);
 
-  const columns: ColumnsType<UsersTableData> = [
+  // Check if we're filtering or sorting (not initial load)
+  const isFilteringOrSorting = useMemo(() => {
+    return isFetching && !isLoading;
+  }, [isFetching, isLoading]);
+
+  const columns: ColumnsType<UsersTableData> = useMemo(() => [
     {
-      title: 'ID',
+      title: (
+        <Space>
+          ID
+          {isFilteringOrSorting && sort.sortBy === 'id' && (
+            <Spin indicator={<LoadingOutlined />} />
+          )}
+        </Space>
+      ),
       dataIndex: 'id',
       key: 'id',
       width: 80,
-      sorter: (a, b) => a.id - b.id,
-      sortDirections: ['descend', 'ascend'],
+      sorter: true,
+      sortOrder: sort.sortBy === 'id' ? (sort.sortOrder === 'asc' ? 'ascend' : 'descend') : null,
     },
     {
-      title: 'First Name',
+      title: (
+        <Space>
+          First Name
+          {isFilteringOrSorting && (filters.firstName || sort.sortBy === 'firstName') && (
+            <Spin indicator={<LoadingOutlined />} />
+          )}
+        </Space>
+      ),
       dataIndex: 'firstName',
       key: 'firstName',
       width: 120,
+      filtered: !!filters.firstName,
       filterDropdown: (props) => (
         <TextFilterDropdown
           {...props}
           placeholder="Search first name"
         />
       ),
-      filterIcon: (filtered) => (
-        <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />
+      filterIcon: () => (
+        <SearchOutlined />
       ),
-      onFilter: (value, record) =>
-        record.firstName.toLowerCase().includes(value.toString().toLowerCase()),
-      sorter: (a, b) => a.firstName.localeCompare(b.firstName),
-      sortDirections: ['descend', 'ascend'],
+      sorter: true,
+      sortOrder: sort.sortBy === 'firstName' ? (sort.sortOrder === 'asc' ? 'ascend' : 'descend') : null,
     },
     {
-      title: 'Last Name',
+      title: (
+        <Space>
+          Last Name
+          {isFilteringOrSorting && (filters.lastName || sort.sortBy === 'lastName') && (
+            <Spin indicator={<LoadingOutlined />} />
+          )}
+        </Space>
+      ),
       dataIndex: 'lastName',
       key: 'lastName',
       width: 120,
+      filtered: !!filters.lastName,
       filterDropdown: (props) => (
         <TextFilterDropdown
           {...props}
           placeholder="Search last name"
         />
       ),
-      filterIcon: (filtered) => (
-        <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />
+      filterIcon: () => (
+        <SearchOutlined />
       ),
-      onFilter: (value, record) =>
-        record.lastName.toLowerCase().includes(value.toString().toLowerCase()),
-      sorter: (a, b) => a.lastName.localeCompare(b.lastName),
-      sortDirections: ['descend', 'ascend'],
+      sorter: true,
+      sortOrder: sort.sortBy === 'lastName' ? (sort.sortOrder === 'asc' ? 'ascend' : 'descend') : null,
     },
     {
       title: 'Name',
@@ -100,16 +125,21 @@ export function Users() {
           <span>{text}</span>
         </Space>
       ),
-      sorter: (a, b) => a.fullName.localeCompare(b.fullName),
-      sortDirections: ['descend', 'ascend'],
     },
     {
-      title: 'Email',
+      title: (
+        <Space>
+          Email
+          {isFilteringOrSorting && sort.sortBy === 'email' && (
+            <Spin indicator={<LoadingOutlined />} />
+          )}
+        </Space>
+      ),
       dataIndex: 'email',
       key: 'email',
       width: 250,
-      sorter: (a, b) => a.email.localeCompare(b.email),
-      sortDirections: ['descend', 'ascend'],
+      sorter: true,
+      sortOrder: sort.sortBy === 'email' ? (sort.sortOrder === 'asc' ? 'ascend' : 'descend') : null,
       render: (email) => <Typography.Text copyable>{email}</Typography.Text>,
     },
     {
@@ -126,24 +156,53 @@ export function Users() {
         />
       ),
     },
-  ];
+  ], [isFilteringOrSorting, filters.firstName, filters.lastName, sort.sortBy, sort.sortOrder]);
 
   const handleTableChange: TableProps<UsersTableData>['onChange'] = (
     pagination,
-    filters,
+    filterInfo,
     sorter
   ) => {
+    // Handle pagination
     if (pagination) {
       setCurrentPage(pagination.current || 1);
       setPageSize(pagination.pageSize || 13);
+    }
+
+    // Handle sorting
+    if (sorter && !Array.isArray(sorter)) {
+      if (sorter.order) {
+        setSort({
+          sortBy: sorter.field as string,
+          sortOrder: sorter.order === 'ascend' ? 'asc' : 'desc',
+        });
+      } else {
+        setSort({});
+      }
+      // Reset to first page when sorting changes
+      setCurrentPage(1);
+    }
+
+    // Handle filtering
+    const newFilters: UsersFilterParams = {};
+    if (filterInfo?.firstName && Array.isArray(filterInfo.firstName)) {
+      newFilters.firstName = filterInfo.firstName[0] as string;
+    }
+    if (filterInfo?.lastName && Array.isArray(filterInfo.lastName)) {
+      newFilters.lastName = filterInfo.lastName[0] as string;
+    }
+
+    // Only update if filters actually changed
+    if (JSON.stringify(newFilters) !== JSON.stringify(filters)) {
+      setFilters(newFilters);
+      // Reset to first page when filters change
+      setCurrentPage(1);
     }
   };
 
   return (
     <ContentLayout>
-      <Card>
-        <Title level={2} style={{ marginBottom: 24 }}>Users</Title>
-
+      <Card className="relative">
         <Table<UsersTableData>
           columns={columns}
           dataSource={tableData}
